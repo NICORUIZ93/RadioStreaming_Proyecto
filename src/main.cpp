@@ -4,13 +4,14 @@
 #include "AudioFileSourceBuffer.h"
 #include "AudioGeneratorMP3.h"
 #include "AudioOutputI2SNoDAC.h"
-// To run, set your ESP8266 build to 160MHz, update the SSID info, and upload.
-// Enter your WiFi setup here:
+
+//Ingresar los datos de la red 
+
 const char *SSID = "Redmi 7";
 const char *PASSWORD = "123456789";
-// Uncomment one link (I have added 6 radio streaming link, you can check each)
-// flawlessly working radio streaming link
-const char *URL = "http://24233.live.streamtheworld.com:3690/RADIO_ACTIVA.mp3"; //'N-JOY vom NDR - www.n-joy.de'
+
+//url de la emisora streaming
+const char *URL = "http://24233.live.streamtheworld.com:3690/RADIO_ACTIVA.mp3"; 
 
 AudioGeneratorMP3 *mp3;
 AudioFileSourceICYStream *file;
@@ -21,7 +22,9 @@ void MDCallback(void *cbData, const char *type, bool isUnicode, const char *stri
 {
     const char *ptr = reinterpret_cast<const char *>(cbData);
     (void)isUnicode; // Punt this ball for now
-    // Note that the type and string may be in PROGMEM, so copy them to RAM for printf
+ 
+//creacion de variables 
+    
     char s1[32], s2[64];
     strncpy_P(s1, type, sizeof(s1));
     s1[sizeof(s1) - 1] = 0;
@@ -42,13 +45,17 @@ void StatusCallback(void *cbData, int code, const char *string)
     Serial.flush();
 }
 void setup()
-{
+{    
+    //inicio de la aplicacicacion 
+    
+    //ajuste de la velocidad de transmision de la comunicacion serial
     Serial.begin(115200);
     delay(1000);
     Serial.println("Connecting to WiFi");
     WiFi.disconnect();
     WiFi.softAPdisconnect(true);
     WiFi.mode(WIFI_STA);
+        //conectado a la red wifi
     WiFi.begin(SSID, PASSWORD);
     // Try forever
     while (WiFi.status() != WL_CONNECTED)
@@ -58,6 +65,8 @@ void setup()
     }
     Serial.println("Connected");
     audioLogger = &Serial;
+    
+    //toma los bytes de informacion y lo almacena en una variable
     file = new AudioFileSourceICYStream(URL);
     file->RegisterMetadataCB(MDCallback, (void *)"ICY");
     buff = new AudioFileSourceBuffer(file, 8192);
